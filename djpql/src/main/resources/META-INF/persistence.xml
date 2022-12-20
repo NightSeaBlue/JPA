@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+			http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+
+	<!-- * 영속성 유닛 설정 : 여기 지정한 name값으로 찾음 -->
+	<persistence-unit name="djpql">		
+		<!-- Entity 클래스 등록 (반드시 할 필요는 없음) -->
+		
+		<!-- JPA 설정(DB 연동 설정) -->
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.driver.OracleDriver"/>
+			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@127.0.0.1:1521:xe"/>
+			<property name="javax.persistence.jdbc.user" value="scott"/>
+			<property name="javax.persistence.jdbc.password" value="tiger"/>
+			
+		<!-- JPA 구현체 설정 -->	
+		<!-- Oracle -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect"/>	
+		
+		<!-- 옵션 -->
+		<!-- Console에 Hibernate 가 실행하는 SQL 출력 -->
+		<property name="hibernate.show_sql" value="true"/>
+		
+		<!-- 테이블 처리(DDL 설정 : Data Definition Language) -->
+		<property name="hibernate.hbm2ddl.auto" value="update"/>
+			
+		</properties>	
+
+	</persistence-unit>
+
+</persistence>

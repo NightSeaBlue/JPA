@@ -1,0 +1,99 @@
+
+## 연관관계 매핑 기준
+
+	- 하나의 테이블과 하나의 엔티티 클래스 매핑을 간단
+	- 테이블의 관계를 엔티티의 관계로 매핑하는 것은 복잡
+
+	(1) 방향성 (direction)	: 단방향 / 양방향
+	
+	(2) 다중성 (Multiplicity)	: N:1 / 1:N / N:M
+
+		- optional	: 연관된 엔티티가 반드시 있어야 하는지 여부 결정 ( default : true )
+					  false이면 항상 있어야 한다
+					  
+		- fetch		: @ManyToOne : EAGER
+					  @OneToMany : LAZY
+					  
+					 - EAGER : 연관 엔티티를 동시에 조회
+					 - LAZY : 연관 앤티티를 실제 사용할 때 조회
+					 
+		- cascade	: 연관엔티티를 같이 저장하거나 삭제 할 때
+	
+## 다대일 단방향 매핑
+
+1. 엔티티 클래스연관관계 매핑
+
+	(0) DB에 테이블 새로 생성 : EMP_T / DEPT_T
+	
+
+	(1) Department.java 
+		` 부서 객체는 직원 객체로부터 참조 당하기에 연관관계 매핑하여 추가할 것은 없다
+		
+	(2) Employee.java
+	
+			@ManyToOne					// N:1 매핑
+			@JoinColumn(name="deptno") // 조인에 사용할 외래 키 컬럼
+									   // 생략은 가능하나 생략시 "참조변수이름_참조테이블의키컬럼"으로 자동 처리됨
+			private Department dept;
+	
+	
+	(3) MainApp.java
+
+		1- insertData()
+		
+		2- selectData()
+		
+			* 실행결과 확인 : left outer join
+			* @ManyToOne을 사용하면 기본적으로 외부조인이 기본
+			* 이너조인 : @ManyToOne(optional=false)
+						=> 실행결과 확인 : left outer join
+		
+		
+		3- Employee.java
+		
+			//@ManyToOne					// N:1 매핑
+			@ManyToOne(optional=false) // 기본이 Outer Join이기에 Inner Join으로 지정하려면			
+			@JoinColumn(name="deptno") // 조인에 사용할 외래 키 컬럼
+									   // 생략은 가능하나 생략시 "참조변수이름_참조테이블의키컬럼"으로 자동 처리됨
+			private Department dept;
+				
+	
+			[참고] Outer Join / Inner Join
+				- Employee.java 에서 	@ManyToOne(optional=false) 
+			
+					- @ManyToOne을 사용하면 기본적으로 외부조인이 기본
+					- 인너조인 : @ManyToOne(optional=false)
+								=> 실행결과 확인 : inner join
+							
+		
+			[참고] fetch 속성 : 연관관계에 있는 객체를 가져오는 시점
+					- EAGER / LAZY 
+					- LAZY 의 경우 Join을 실행하지 않은 상태에서, 조건과 일치하는 데이터를 찾아 가져옴. 즉 Select 문을 두번 실행
+					- EAGER의 경우 일치하는 정보를 찾기 위해 Join을 최우선적으로 실행
+					
+				- Employee.java 에서 	@ManyToOne(optional=false, fetch=FetchType.LAZY)
+				- MainApp.java 에서 아래 문장을 주석달고/ 주석지우고 각각 확인
+			
+				Employee e1 = em.find(Employee.class, 7788);  // 사번 7788번인 레코드 검색
+				System.out.println(e1.getEname() + "님 정보 ");
+				System.out.println(e1.getEname() + "님 부서 : " + e1.getDept().getDname());
+			
+		4- updateData()
+		
+		5- deleteData()
+
+		
+			[참고] 영속성전이 cascade
+			- 부서가 없어지면 해당 부서의 직원정보를 삭제하고자 한다면
+			- Department.java에 추가
+			
+				// 영속성전이 cascade
+				@OneToMany(mappedBy = "dept", cascade= {CascadeType.PERSIST, CascadeType.REMOVE})
+				private List<Employee> employeeList = new ArrayList<Employee>();
+			
+			
+$$ 객체의 관계가 테이블의 관계와 일치하지 않기에 어렵다
+
+			
+			
+			
